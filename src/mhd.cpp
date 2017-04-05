@@ -90,6 +90,12 @@ void primitives(real* Y, real* W){
 	}
 }
 
+void Ref2Phy(real *x, real *y, real *z, real *t){
+  //real ZERO_VIRGULE_CINQ = 0.5:
+  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + X_MAX)/2
+  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + Y_MAX)/2
+}
+
 
 void Wexact(real* x, real* y, real* W){
 
