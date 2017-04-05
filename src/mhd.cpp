@@ -90,10 +90,10 @@ void primitives(real* Y, real* W){
 	}
 }
 
-void Ref2Phy(real *x, real *y, real *z, real *t){
+void Ref2PhysMap(real *x, real *y, real *z, real *t){
   //real ZERO_VIRGULE_CINQ = 0.5:
-  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + X_MAX)/2
-  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + Y_MAX)/2
+  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + _XMAX)/2;
+  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + _YMAX)/2;
 }
 
 
@@ -244,7 +244,7 @@ void GnuPlot(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M])
             real bz = Wn1[i+6*_NXTRANSBLOCK*_NYTRANSBLOCK+j*_NXTRANSBLOCK];
             real bx = Wn1[i+7*_NXTRANSBLOCK*_NYTRANSBLOCK+j*_NXTRANSBLOCK];
 
-            //Ref2PhysMap(&xx,&yy,&x,&y);
+            Ref2PhysMap(&xx,&yy,&x,&y);
             ficr << x<< " " << r << endl;
             ficux << x<< " " << ux/r << endl;
             ficp << x<< " " << (gam-1)*(p-0.5*r*((ux/r)*(ux/r)+(uy/r)*(uy/r)+(uz/r)*(uz/r))-0.5*(bx*bx+by*by+bz*bz)) << endl;
@@ -316,7 +316,7 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
             for(int ii=0;ii<4;ii++){
                 xx=1./_NX*(i+di[ii])*split;
                 yy=1./_NY*(j+dj[ii])*split;
-      //          Ref2PhysMap(&xx,&yy,&x,&y);
+                Ref2PhysMap(&xx,&yy,&x,&y);
                 int nnoe=4*(j*_NX/split+i)+ii+1;
                 double xd=x,yd=y,zd=0;
                 fic.write((char*) &nnoe,sizeof(int));
