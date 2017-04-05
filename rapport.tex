@@ -1,7 +1,48 @@
 \documentclass{report}
 
 \begin{document}
+  \begin{equation}
+    \partial_t
+    \left( \begin{array}{c}
+    \rho \\
+    \rho u \\
+    Q \\
+    B
+    \end{array}
+  \right)
+  + \nabla .
+  \left( \begin{array}{c}
+    \rho u \\
+    \rho u \otimes u + (p + \frac{B.B}{2})I - B \otimes B \\
+    (Q + p + \frac{B.B}{2})u - (B.u)B \\
+    u \otimes B - B \otimes u \\
+    \end{array}
+  \right)
+  = 0,
+  \end{equation}
+  \begin{equation}
+    Q = \rho e + \rho \frac{u.u}{2} + \frac{B.B}{2}
+  \end{equation}
+  \begin{equation}
+    p = P(\rho,e) = (\gamma - 1)\rho e, \gamma > 1.
+  \end{equation}
+
+
+
   \begin{math}
-    k_{12345646456+898985131}
+    \frac{\partial}{\partial t}W + \sum\limits_{i=1}^d \frac{\partial}{\partial x_i}F^i(W) = 0.
   \end{math}
+
+  En consid\'erant :
+  \begin{math}
+    \partial\star = \frac{\partial}{\partial x_\star}
+  \end{math}
+   et
+   \begin{math}
+     \partial_iF^i(W) = \sum\limits_{i=1}^d\frac{\partial}{\partial x_i}F^i(W).
+   \end{math} 
+   On obtient l'\'equation :
+   \begin{math}
+     \partial_tW+\partial_iF^i(W) = 0.
+   \end{math}
 \end{document}
