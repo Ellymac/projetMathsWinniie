@@ -89,7 +89,6 @@ void primitives(real* Y, real* W){
 		Y[i] = Y[i] / Y[0];
 	}
 }
-Contact GitHub API Training Shop Blog About
 
 
 void Wexact(real* x, real* y, real* W){
@@ -239,7 +238,7 @@ void GnuPlot(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M])
             real bz = Wn1[i+6*_NXTRANSBLOCK*_NYTRANSBLOCK+j*_NXTRANSBLOCK];
             real bx = Wn1[i+7*_NXTRANSBLOCK*_NYTRANSBLOCK+j*_NXTRANSBLOCK];
 
-            Ref2PhysMap(&xx,&yy,&x,&y);
+            //Ref2PhysMap(&xx,&yy,&x,&y);
             ficr << x<< " " << r << endl;
             ficux << x<< " " << ux/r << endl;
             ficp << x<< " " << (gam-1)*(p-0.5*r*((ux/r)*(ux/r)+(uy/r)*(uy/r)+(uz/r)*(uz/r))-0.5*(bx*bx+by*by+bz*bz)) << endl;
@@ -311,7 +310,7 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
             for(int ii=0;ii<4;ii++){
                 xx=1./_NX*(i+di[ii])*split;
                 yy=1./_NY*(j+dj[ii])*split;
-                Ref2PhysMap(&xx,&yy,&x,&y);
+      //          Ref2PhysMap(&xx,&yy,&x,&y);
                 int nnoe=4*(j*_NX/split+i)+ii+1;
                 double xd=x,yd=y,zd=0;
                 fic.write((char*) &nnoe,sizeof(int));
@@ -487,14 +486,14 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
 int main(int argc, char const* argv[]){
 
     real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
-    InitData(Wn1);
+    //InitData(Wn1);
 
     int iter = 0;
     real dtt = 0;
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
-        TimeStepCPU(Wn1,&dtt);
+    //    TimeStepCPU(Wn1,&dtt);
         cout << t << endl;
     }
 
