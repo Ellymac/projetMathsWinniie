@@ -1,0 +1,58 @@
+\documentclass{report}
+
+\begin{document}
+  \begin{center}
+  \textbf{\huge{Rapport Projet Maths}}
+  \end{center}
+  \begin{enumerate}
+  \item
+    Le Lalalala :
+  \begin{equation}
+    \partial_t
+    \left( \begin{array}{c}
+    \rho \\
+    \rho u \\
+    Q \\
+    B
+    \end{array}
+  \right)
+  + \nabla .
+  \left( \begin{array}{c}
+    \rho u \\
+    \rho u \otimes u + (p + \frac{B.B}{2})I - B \otimes B \\
+    (Q + p + \frac{B.B}{2})u - (B.u)B \\
+    u \otimes B - B \otimes u \\
+    \end{array}
+  \right)
+  = 0,
+  \end{equation}
+  \begin{equation}
+    Q = \rho e + \rho \frac{u.u}{2} + \frac{B.B}{2}
+  \end{equation}
+  \begin{equation}
+    p = P(\rho,e) = (\gamma - 1)\rho e, \gamma > 1.
+  \end{equation} \\
+
+
+  \item
+   En utilisant la m\'ethode propos\'ee en 2002, ce systeme devient : \\
+  \begin{center}
+    \begin{math}
+      \frac{\partial}{\partial t}W + \sum\limits_{i=1}^d \frac{\partial}{\partial x_i}F^i(W) = 0.
+    \end{math}
+  \end{center}
+
+  En consid\'erant :
+  \begin{math}
+    \partial\star = \frac{\partial}{\partial x_\star}
+  \end{math}
+   et
+   \begin{math}
+     \partial_iF^i(W) = \sum\limits_{i=1}^d\frac{\partial}{\partial x_i}F^i(W).
+   \end{math} \\
+   On obtient l'\'equation :
+   \begin{math}
+     \partial_tW+\partial_iF^i(W) = 0.
+   \end{math}
+ \end{enumerate}
+\end{document}

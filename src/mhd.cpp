@@ -73,6 +73,48 @@ typedef float real;
 // }}}
 
 // wexact {{{
+
+void conservatives(real* Y, real* W){
+	
+	real gam = _GAM;
+	
+	W = Y;
+	int i;
+	for(i = 1; i <= 4; i ++){
+		if(i == 2){
+			W[i] = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
+		}
+		else{
+			W[i] = W[0] * W[i];
+		}
+		
+	}
+}
+
+void primitives(real* Y, real* W){
+	
+	real gam = _GAM;
+	
+	Y = W;
+	int i;
+	for(i = 1; i <= 4; i ++){
+		if(i == 2){
+			Y[i] = (gam-1)*(W[i] - W[0]*(W[1]*W[1]+W[3]*W[3]/(Y[0]*Y[0])+W[4]*W[4]/(Y[0]*Y[0]))/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6]));
+		}
+		else{
+			Y[i] = Y[i] / Y[0];
+		}
+	}
+}
+
+void Ref2PhysMap(real *x, real *y, real *z, real *t){
+  //real ZERO_VIRGULE_CINQ = 0.5:
+  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + _XMAX)/2;
+  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + _YMAX)/2;
+}
+
+
+
 void Wexact(real* x, real* y, real* W){
 
 #ifdef _1D
@@ -178,7 +220,16 @@ void Wexact(real* x, real* y, real* W){
 // }}}
 
 
+void InitData(real* w){
+  //(rho, u1, p, u2, u3, B1, B2, B3, psi)
+  //printf("%i %i %i",_NXTRANSBLOCK, _NYTRANSBLOCK, _M);
+  for(int i=0;i<_NXTRANSBLOCK*_NYTRANSBLOCK*_M;i++){
+    real i1 = i/(_NXTRANSBLOCK*_NYTRANSBLOCK);
+    real i2 = i%(_NXTRANSBLOCK*_NYTRANSBLOCK); // i2 c'est pas beau
+    Wexact(&i1,&i2,w);
+  }
 
+}
 
 
 
@@ -472,16 +523,17 @@ int main(int argc, char const* argv[]){
 
     int iter = 0;
     real dtt = 0;
+    /*
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
         TimeStepCPU(Wn1,&dtt);
         cout << t << endl;
     }
-
-#ifdef _1D
-    GnuPlot(Wn1);
-#endif
+    */
+//#ifdef _1D
+    //GnuPlot(Wn1);
+//#endif
     PlotGmshBinary(Wn1);
     return 0;
 }
