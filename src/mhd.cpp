@@ -74,11 +74,21 @@ typedef float real;
 
 // wexact {{{
 
+// c'est les vrais fonctions pour les vecteurs je pense très fort
+void copy(real* A, real* B){
+	int i;
+
+	for(i = 0; i < 9; i ++){
+		A[i] = B[i];
+	}
+}
+
+
 void conservatives(real* Y, real* W){
-	
+
 	real gam = _GAM;
-	
-	W = Y;
+
+	copy(W,Y);
 	int i;
 	for(i = 1; i <= 4; i ++){
 		if(i == 2){
@@ -87,15 +97,15 @@ void conservatives(real* Y, real* W){
 		else{
 			W[i] = W[0] * W[i];
 		}
-		
+
 	}
 }
 
 void primitives(real* Y, real* W){
-	
+
 	real gam = _GAM;
-	
-	Y = W;
+
+	copy(Y,W);
 	int i;
 	for(i = 1; i <= 4; i ++){
 		if(i == 2){
@@ -109,8 +119,8 @@ void primitives(real* Y, real* W){
 
 void Ref2PhysMap(real *x, real *y, real *z, real *t){
   //real ZERO_VIRGULE_CINQ = 0.5:
-  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + _XMAX)/2;
-  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + _YMAX)/2;
+  *z = (*x - 0.5) * (_XMAX - _XMIN) + (_XMIN + _XMAX)/2.;
+  *t = (*y - 0.5) * (_YMAX - _YMIN) + (_YMIN + _YMAX)/2.;
 }
 
 
@@ -214,6 +224,7 @@ void Wexact(real* x, real* y, real* W){
     Y[8] = 0.0;
 
     conservatives(Y, W);
+    printf("%f ",W[0]);
 #endif
 
 }
@@ -221,14 +232,38 @@ void Wexact(real* x, real* y, real* W){
 
 
 void InitData(real* w){
-  //(rho, u1, p, u2, u3, B1, B2, B3, psi)
-  //printf("%i %i %i",_NXTRANSBLOCK, _NYTRANSBLOCK, _M);
-  for(int i=0;i<_NXTRANSBLOCK*_NYTRANSBLOCK*_M;i++){
-    real i1 = i/(_NXTRANSBLOCK*_NYTRANSBLOCK);
-    real i2 = i%(_NXTRANSBLOCK*_NYTRANSBLOCK); // i2 c'est pas beau
-    Wexact(&i1,&i2,w);
-  }
 
+
+  real wtmp[_M];
+  real x, y;
+  for(int i=0; i<_NXTRANSBLOCK; i++){
+    for(int j=0; j<_NYTRANSBLOCK; j++){
+      real i2 = ((real)i)/(real)_NXTRANSBLOCK; // i2 c'est pas beau
+      real j2 = ((real)j)/(real)_NYTRANSBLOCK;
+      Ref2PhysMap(&i2,&j2,&x,&y);
+      Wexact(&x,&y,wtmp);
+      //printf("i2 : %f; j2 : %f; x : %f; y : %f || ",i2,j2,x,y);
+      //printf("i : %d; j : %d; i2 : %d; j2 : %d; x : %d; y : %d\n",i,j,i2,j2,x,y);
+      for(int k=0;k<_M;k++){
+        //printf("%f |", wtmp[k]);
+        w[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] = wtmp[k];
+      }
+      //printf("\n");
+      //printf("\n");
+
+      //printf("NX : %i; NY : %i\n", _NXTRANSBLOCK, _NYTRANSBLOCK);
+    }
+  }
+  /*
+  for(int i=0;i<_NXTRANSBLOCK*_NYTRANSBLOCK;i++){
+    real i1 = (i/_M)/(_NXTRANSBLOCK*_NYTRANSBLOCK);
+    real i2 = (i/_M)%(_NXTRANSBLOCK*_NYTRANSBLOCK); // i2 c'est pas beau
+    real x, y;
+
+
+    Wexact(&x,&y,w+(i*_M));
+  }
+  */
 }
 
 
