@@ -1,3 +1,5 @@
+// c'est les vrais fonctions pour les vecteurs je pense très fort
+
 void conservatives(real* Y, real* W){
 	
 	real gam = _GAM;
