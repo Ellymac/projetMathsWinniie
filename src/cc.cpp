@@ -1,10 +1,18 @@
 // c'est les vrais fonctions pour les vecteurs je pense très fort
+void copy(real* A, real* B){
+	int i;
+	
+	for(i = 0; i < 9; i ++){
+		A[i] = B[i];
+	}
+}
+
 
 void conservatives(real* Y, real* W){
 	
 	real gam = _GAM;
 	
-	W = Y;
+	copy(W,Y);
 	int i;
 	for(i = 1; i <= 4; i ++){
 		if(i == 2){
@@ -21,7 +29,7 @@ void primitives(real* Y, real* W){
 	
 	real gam = _GAM;
 	
-	Y = W;
+	copy(Y,W);
 	int i;
 	for(i = 1; i <= 4; i ++){
 		if(i == 2){
