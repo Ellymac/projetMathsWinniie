@@ -1,4 +1,7 @@
 void conservatives(real* Y, real* W){
+	
+	real gam = _GAM;
+	
 	W = Y;
 	int i;
 	for(i = 1; i <= 4; i ++){
@@ -13,6 +16,9 @@ void conservatives(real* Y, real* W){
 }
 
 void primitives(real* Y, real* W){
+	
+	real gam = _GAM;
+	
 	Y = W;
 	int i;
 	for(i = 1; i <= 4; i ++){
