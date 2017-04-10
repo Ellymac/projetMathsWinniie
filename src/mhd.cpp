@@ -97,6 +97,7 @@ void Ref2PhysMap(real *x, real *y, real *z, real *t){
 }
 
 
+
 void Wexact(real* x, real* y, real* W){
 
 #ifdef _1D
@@ -202,7 +203,14 @@ void Wexact(real* x, real* y, real* W){
 // }}}
 
 
+void InitData(real* w){
+  //(rho, u1, p, u2, u3, B1, B2, B3, psi)
+  for(real i=0;i<9;i++){
+    real j = 0;
+    Wexact(&i,&j,w);
+  }
 
+}
 
 
 
@@ -492,14 +500,14 @@ void PlotGmshBinary(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
 int main(int argc, char const* argv[]){
 
     real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
-    //InitData(Wn1);
+    InitData(Wn1);
 
     int iter = 0;
     real dtt = 0;
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
-    //    TimeStepCPU(Wn1,&dtt);
+        TimeStepCPU(Wn1,&dtt);
         cout << t << endl;
     }
 
