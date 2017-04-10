@@ -205,9 +205,11 @@ void Wexact(real* x, real* y, real* W){
 
 void InitData(real* w){
   //(rho, u1, p, u2, u3, B1, B2, B3, psi)
-  for(real i=0;i<9;i++){
-    real j = 0;
-    Wexact(&i,&j,w);
+  //printf("%i %i %i",_NXTRANSBLOCK, _NYTRANSBLOCK, _M);
+  for(int i=0;i<_NXTRANSBLOCK*_NYTRANSBLOCK*_M;i++){
+    real i1 = i/(_NXTRANSBLOCK*_NYTRANSBLOCK);
+    real i2 = i%(_NXTRANSBLOCK*_NYTRANSBLOCK); // i2 c'est pas beau
+    Wexact(&i1,&i2,w);
   }
 
 }
@@ -504,16 +506,17 @@ int main(int argc, char const* argv[]){
 
     int iter = 0;
     real dtt = 0;
+    /*
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
         TimeStepCPU(Wn1,&dtt);
         cout << t << endl;
     }
-
-#ifdef _1D
-    GnuPlot(Wn1);
-#endif
+    */
+//#ifdef _1D
+    //GnuPlot(Wn1);
+//#endif
     PlotGmshBinary(Wn1);
     return 0;
 }
