@@ -551,7 +551,7 @@ int main(int argc, char const* argv[]){
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
-        TimeStepCPU(Wn1,&dtt);
+        //TimeStepCPU(Wn1,&dtt);
         cout << t << endl;
     }
 
