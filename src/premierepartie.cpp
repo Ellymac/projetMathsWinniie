@@ -79,4 +79,3 @@ void TimesStepCPU1D(real** Wn1){
   // ou on l'appelle dans une boucle ?
 
 }
-
