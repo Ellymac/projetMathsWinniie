@@ -311,9 +311,9 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
       for(int k=0;k<_M;k++){
         Wi[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
       }
-      int b;
-      scanf("%d",&b);
-      printf("rho : %f\n", Wn1[0]);
+      //int b;
+      //scanf("%d",&b);
+      //printf("rho : %f\n", Wn1[0]);
       //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
       if(i > 0 && i < _NXTRANSBLOCK ){
         for(int k = 0; k < _M; k ++){
@@ -345,8 +345,8 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
       }
       for(int k = 0; k < _M; k ++){
         Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] = Wns[i + j] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] - (*dtt/dx)*((real)flux1[k] - flux2[k]);
-        printf("i : %d, j : %d, k : %d \n", i, j, k);
-        printf("valeur : %f, flux1 : %f, flux2 : %f, Wns : %f \n", Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ], flux1[k], flux2[k], Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ]);
+        //printf("i : %d, j : %d, k : %d \n", i, j, k);
+       // printf("valeur : %f, flux1 : %f, flux2 : %f, Wns : %f \n", Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ], flux1[k], flux2[k], Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ]);
       }
     }
     //printf("\n");
@@ -402,7 +402,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
       for(int k=0;k<_M;k++){
         W[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
       }
-      printf("rho : %f\n", Wn1[0]);
+      //printf("rho : %f\n", Wn1[0]);
       //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
       if(i > 0 && i < _NXTRANSBLOCK ){
         for(int k = 0; k < _M; k ++){
