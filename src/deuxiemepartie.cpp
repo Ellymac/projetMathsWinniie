@@ -52,16 +52,16 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
-      Wi[j] = Wn1[_M * i + j];
+      Wi[j] = Wn1[i + j];
     }
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
     if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
       for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[_M * (i - 1) + j];
+        W1[j] = Wn1[(i - 1) + j];
       }
       for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[_M * (i + 1) + j];
+        W2[j] = Wn1[(i + 1) + j];
       }
       Rusanov(Wi, W2, norx, flux1);
       Rusanov(W1, Wi, norx, flux2);
@@ -71,7 +71,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
     // j ai mis oui pour l instant mais cest a verifier
     else if(i == 0){
       for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[_M * (i + 1) + j];
+        W2[j] = Wn1[(i + 1) + j];
       }
       Rusanov(Wi, W2, norx, flux1);
       Rusanov(0, Wi, norx, flux2);
@@ -79,7 +79,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
     else{
       for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[_M * (i - 1) + j];
+        W1[j] = Wn1[(i - 1) + j];
       }
       Rusanov(Wi, 0, norx, flux1);
       Rusanov(W1, Wi, norx, flux2);
@@ -87,7 +87,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
 
     for(j = 0; j < _M; j ++){
-      Wns[i * _M + j] = (real)Wn1[i * _M + j] - (real)(dt/dx)*((real)flux1[j] - (real)flux2[j]);
+      Wns[i + j] = (real)Wn1[i * _M + j] - (real)(dt/dx)*((real)flux1[j] - (real)flux2[j]);
     }
 
   }
@@ -111,7 +111,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real dx = (_XMAX - _XMIN)/Nx;
 
   real Ny = _NYTRANSBLOCK;
-  real dy = (_YMAX - _YMIN)/Ny
+  real dy = (_YMAX - _YMIN)/Ny;
 
   int i, j;
 
@@ -142,59 +142,71 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
-      W[j] = Wn1[_M * i + j];
+      W[j] = Wn1[i + j];
     }
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
     if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
       for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[_M * (i - 1) + j];
+        Wi1[j] = Wn1[(i - 1) + j];
       }
       for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[_M * (i + 1) + j];
+        Wi2[j] = Wn1[(i + 1) + j];
       }
-      Rusanov(W, W2, norx, flux1);
-      Rusanov(W1, W, norx, flux2);
+      Rusanov(W, Wi2, norx, flux1);
+      Rusanov(Wi1, W, norx, flux2);
     }
 
     // est ce que ça vaut 0 en dehors de la grille ?
     // j ai mis oui pour l instant mais cest a verifier
     else if(i == 0){
       for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[_M * (i + 1) + j];
+        Wi2[j] = Wn1[(i + 1) + j];
       }
-      Rusanov(Wi, W2, norx, flux1);
+      Rusanov(Wi, Wi2, norx, flux1);
       Rusanov(0, Wi, norx, flux2);
     }
 
     else{
       for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[_M * (i - 1) + j];
+        Wi1[j] = Wn1[(i - 1) + j];
       }
       Rusanov(Wi, 0, norx, flux1);
-      Rusanov(W1, Wi, norx, flux2);
+      Rusanov(Wi1, Wi, norx, flux2);
     }
 
     if(i < _NXTRANSBLOCK){
-      Rusanov(W, W4, norx, flux3);
+      for(j = 0; j < _M; j ++){
+        Wj2[j] = Wn1[(i + _NXTRANSBLOCK) + j];
+      }
+      Rusanov(W, Wj2, norx, flux3);
       Rusanov(0, W, norx, flux4);
     }
     else if(i > _NXTRANSBLOCK * (_NYTRANSBLOCK - 1)){
+      for(j = 0; j < _M; j ++){
+        Wj1[j] = Wn1[(i - _NXTRANSBLOCK) + j];
+      }
       Rusanov(W, 0, norx, flux3);
-      Rusanov(W3, W, norx, flux4);
+      Rusanov(Wj1, W, norx, flux4);
     }
     else{
-      Rusanov(W, W4, norx, flux3);
-      Rusanov(W3, W, norx, flux4);
+      for(j = 0; j < _M; j ++){
+        Wj1[j] = Wn1[(i - _NXTRANSBLOCK) + j];
+      }
+      for(j = 0; j < _M; j ++){
+        Wj2[j] = Wn1[(i + _NXTRANSBLOCK) + j];
+      }
+      Rusanov(W, Wj2, norx, flux3);
+      Rusanov(Wj1, W, norx, flux4);
     }
 
     for(j = 0; j < _M; j ++){
-      Wns[i * _M + j] = (real)Wn1[i * _M + j] - (real)(dtt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(dtt/dy)((real)flux3[j] - (real)flux4[j]);
+      Wns[i + j] = (real)Wn1[i * _M + j] - (real)(dtt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(dtt/dy)((real)flux3[j] - (real)flux4[j]);
     }
 
   }
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; I ++){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
 
