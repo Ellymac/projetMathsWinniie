@@ -36,21 +36,21 @@
 #define Abs(a) ((a) > (0) ? (a) : (-a))
 
 #ifdef _1D
-    #define _LONGUEURX (10)                         //Longueur du domaine suivant x
-    #define _LONGUEURY (10)                         //Longueur du domaine suivant y
-    #define _XMIN (-5)
-    #define _XMAX (5)
-    #define _YMIN (-5)
-    #define _YMAX (5)
+#define _LONGUEURX (10)                         //Longueur du domaine suivant x
+#define _LONGUEURY (10)                         //Longueur du domaine suivant y
+#define _XMIN (-5)
+#define _XMAX (5)
+#define _YMIN (-5)
+#define _YMAX (5)
 #endif
 #ifdef _2D
-    // Orzag Tang
-    #define _LONGUEURX (6.2831853)                  //Longueur du domaine suivant x
-    #define _LONGUEURY (6.2831853)                  //Longueur du domaine suivant y
-    #define _XMIN (0)
-    #define _XMAX (6.2831853)
-    #define _YMIN (0)
-    #define _YMAX (6.2831853)
+// Orzag Tang
+#define _LONGUEURX (6.2831853)                  //Longueur du domaine suivant x
+#define _LONGUEURY (6.2831853)                  //Longueur du domaine suivant y
+#define _XMIN (0)
+#define _XMAX (6.2831853)
+#define _YMIN (0)
+#define _YMAX (6.2831853)
 #endif
 
 
@@ -63,72 +63,72 @@
 
 // c'est les vraies fonctions pour les vecteurs je pense très fort
 void copy(real* A, real* B){
-	int i;
+  int i;
 
-	for(i = 0; i < 9; i ++){
-		A[i] = B[i];
-	}
+  for(i = 0; i < 9; i ++){
+    A[i] = B[i];
+  }
 }
 
 
 void conservatives(real* Y, real* W){
 
-	real gam = _GAM;
+  real gam = _GAM;
 
-	copy(W,Y);
-	int i;
-	for(i = 1; i <= 4; i ++){
-		if(i == 2){
-			W[i] = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
-		}
-		else{
-			W[i] = W[0] * W[i];
-		}
+  copy(W,Y);
+  int i;
+  for(i = 1; i <= 4; i ++){
+    if(i == 2){
+      W[i] = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
+    }
+    else{
+      W[i] = W[0] * W[i];
+    }
 
-	}
+  }
 }
 
 void primitives(real* Y, real* W){
 
-	real gam = _GAM;
+  real gam = _GAM;
 
-	copy(Y,W);
-	int i;
-	for(i = 1; i <= 4; i ++){
-		if(i == 2){
-			Y[i] = (gam-1)*(W[i] - W[0]*(W[1]*W[1]+W[3]*W[3]/(Y[0]*Y[0])+W[4]*W[4]/(Y[0]*Y[0]))/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6]));
-		}
-		else{
-			Y[i] = Y[i] / Y[0];
-		}
-	}
+  copy(Y,W);
+  int i;
+  for(i = 1; i <= 4; i ++){
+    if(i == 2){
+      Y[i] = (gam-1)*(W[i] - W[0]*(W[1]*W[1]+W[3]*W[3]/(Y[0]*Y[0])+W[4]*W[4]/(Y[0]*Y[0]))/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6]));
+    }
+    else{
+      Y[i] = Y[i] / Y[0];
+    }
+  }
 }
 
 void flux(real* W, real* vn, real* flux){
 
-    real gam = _GAM;
-    real un,bn,E;
+  real gam = _GAM;
+  real un,bn,E;
 
-    real Y[_M];
+  real Y[_M];
 
-    primitives(W,Y);
+  primitives(W,Y);
 
-    real b = Y[7];
+  real b = Y[7];
 
-    un = Y[1]*vn[0]+Y[3]*vn[1]+Y[4]*vn[2];
-    bn = Y[7]*vn[0]+Y[5]*vn[1]+Y[6]*vn[2];
+  un = Y[1]*vn[0]+Y[3]*vn[1]+Y[4]*vn[2];
+  bn = Y[7]*vn[0]+Y[5]*vn[1]+Y[6]*vn[2];
 
-    E = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
+  E = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
 
-    flux[0] = Y[0]*un;
-    flux[1] = Y[0]*un*Y[1] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[0] - bn*Y[7];
-    flux[2] = (E + Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*un - (Y[7]*Y[1] + Y[5]*Y[3] + Y[6]*Y[4])*bn;
-    flux[3] = Y[0]*un*Y[3] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[1] - bn*Y[5];
-    flux[4] = Y[0]*un*Y[4] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[2] - bn*Y[6];
-    flux[5] = -bn*Y[3] + un*Y[5] + Y[8]*vn[1];
-    flux[6] = -bn*Y[4] + un*Y[6] + Y[8]*vn[2];
-    flux[7] = -bn*Y[1] + un*Y[7] + Y[8]*vn[0];
-    flux[8] = _CH*_CH*bn;
+  flux[0] = Y[0]*un;
+  flux[1] = Y[0]*un*Y[1] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[0] - bn*Y[7];
+  flux[2] = (E + Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*un - (Y[7]*Y[1] + Y[5]*Y[3] + Y[6]*Y[4])*bn;
+  flux[3] = Y[0]*un*Y[3] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[1] - bn*Y[5];
+  flux[4] = Y[0]*un*Y[4] + (Y[2] + (Y[7]*Y[7] + Y[5]*Y[5] + Y[6]*Y[6])/2)*vn[2] - bn*Y[6];
+  flux[5] = -bn*Y[3] + un*Y[5] + Y[8]*vn[1];
+  flux[6] = -bn*Y[4] + un*Y[6] + Y[8]*vn[2];
+  flux[7] = -bn*Y[1] + un*Y[7] + Y[8]*vn[0];
+  flux[8] = _CH*_CH*bn;
 
 }
 
@@ -163,7 +163,6 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real Nx = _NXTRANSBLOCK;
   real dx = (_XMAX - _XMIN)/Nx;
 
-  int i, j;
 
   //tab suivant
   real Wns[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
@@ -183,66 +182,54 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   // utile pour le calcul
   real flux1[_M];
   real flux2[_M];
-  real coucou;
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
-    //printf(" début %d\n",i);
-    //on recupere les composant W
-
-    for(j = 0; j < _M; j ++){
-      Wi[j] = Wn1[i+j];
-    }
-
-
-    //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
-      for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[(i - 1) + j];
+  for(int i=0; i<_NXTRANSBLOCK; i++){
+    for(int j=0; j<_NYTRANSBLOCK; j++){
+      //printf("i2 : %f; j2 : %f; x : %f; y : %f || ",i2,j2,x,y);
+      //printf("i : %d; j : %d; i2 : %d; j2 : %d; x : %d; y : %d\n",i,j,i2,j2,x,y);
+      for(int k=0;k<_M;k++){
+        //printf("%f |", wtmp[k]);
+        Wi[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
       }
-      for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[(i + 1) + j];
+
+      //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
+      if(i > 0 && i < _NXTRANSBLOCK - 1){
+        for(int k = 0; k < _M; k ++){
+          W1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+          W2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+        }
+        Rusanov(Wi, W2, norx, flux1);
+        Rusanov(W1, Wi, norx, flux2);
       }
-      Rusanov(Wi, W2, norx, flux1);
-      Rusanov(W1, Wi, norx, flux2);
-    }
 
-    // est ce que ça vaut 0 en dehors de la grille ?
-    // j ai mis oui pour l instant mais cest a verifier
-    else if(i == 0){
-      for(j = 0; j < _M; j ++){
-        W2[j] = Wn1[(i + 1) + j];
+      // est ce que ça vaut 0 en dehors de la grille ?
+      // j ai mis oui pour l instant mais cest a verifier
+      else if(i == 0){
+        for(int k = 0; k < _M; k ++){
+          W2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+        }
+        Rusanov(Wi, W2, norx, flux1);
+        Rusanov(zero, Wi, norx, flux2);
       }
-      Rusanov(Wi, W2, norx, flux1);
-      Rusanov(zero, Wi, norx, flux2);
-    }
 
-    else{
-      for(j = 0; j < _M; j ++){
-        W1[j] = Wn1[(i - 1) + j];
+      else{
+        for(int k = 0; k < _M; k ++){
+          W1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+        }
+        Rusanov(Wi, zero, norx, flux1);
+        Rusanov(W1, Wi, norx, flux2);
       }
-      Rusanov(Wi, zero, norx, flux1);
-      Rusanov(W1, Wi, norx, flux2);
+      for(int k = 0; k < _M; k ++){
+        Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] = Wns[i + j] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] - (*dtt/dx)*((real)flux1[j] - flux2[j]);;
+      }
     }
+    //printf("\n");
+    //printf("\n");
 
-    //printf(" milieu %d %f\n",i);
-
-    for(j = 0; j < _M; j ++){
-      //printf("Wns[%d+%d] : %f \n", i,j, Wns[i+j]); // Wns[i+j] ne provoque pas de segfault
-      coucou = Wn1[i+j] - (*dtt/dx)*(flux1[j] - flux2[j]);
-      //printf("coucou : %f\n", coucou); // coucou ne provoque pas de segfault
-      Wns[i+j] = coucou; // provoque un segfault
-      //printf("  j  : %d; i+j : %d, max : %d \n",j,i+j, _NXTRANSBLOCK*_NYTRANSBLOCK*_M);
-    }
-
-
-
+    //printf("NX : %i; NY : %i\n", _NXTRANSBLOCK, _NYTRANSBLOCK);
   }
-
-  // est ce que la fonction se rappel elle meme et affiche la grille
-  // ou on l'appelle dans une boucle ?
-
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
+  for(int i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
   free(zero);
