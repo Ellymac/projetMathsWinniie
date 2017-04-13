@@ -24,7 +24,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   //Nx nombre de mailles du maillage dans la direction x
   // ça vaut peut etre _NXTRANSBLOCK : a verifier
   // je le met a 1 pour que ça compile
-  real Nx = 1;
+  real Nx = _NXTRANSBLOCK;
   real dx = (_XMAX - _XMIN)/Nx;
 
   int i, j;
