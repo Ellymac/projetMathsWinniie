@@ -3,6 +3,7 @@
 
 typedef float real;
 
+void Wexact(real* x, real* y, real* W);
 void copy(real* A, real* B);
 void conservatives(real* Y, real* W);
 void primitives(real* Y, real* W);

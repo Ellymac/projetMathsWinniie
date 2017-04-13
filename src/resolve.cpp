@@ -61,6 +61,110 @@
 #define _CH (5)
 
 
+void Wexact(real* x, real* y, real* W){
+
+#ifdef _1D
+    real YL[_M], YR[_M], WR[_M], WL[_M];
+
+//    // Test de Choc fort
+//    YL[0] = 3;
+//    YL[1] = 1.3;
+//    YL[3] = 0;
+//    YL[4] = 0;
+//    YL[2] = 3;
+//    YL[5] = 1;
+//    YL[6] = 1;
+//    YL[7] = 1.5;
+//    YL[8] = 0;
+//
+//    YR[0] = 1;
+//    YR[1] = 1.3;
+//    YR[3] = 0;
+//    YR[4] = 0;
+//    YR[2] = 1;
+//    YR[5] = 0.0707372016677029;
+//    YR[6] = 0.9974949866040544;
+//    YR[7] = 1.5;
+//    YR[8] = 0;
+
+//    // Test de Brio et Wu
+//    YL[0] = 1;
+//    YL[1] = 0;
+//    YL[3] = 0;
+//    YL[4] = 0;
+//    YL[2] = 1;
+//    YL[5] = 1;
+//    YL[6] = 0;
+//    YL[7] = 0.75;
+//    YL[8] = 0;
+//
+//    YR[0] = 0.125;
+//    YR[1] = 0;
+//    YR[3] = 0;
+//    YR[4] = 0;
+//    YR[2] = 0.1;
+//    YR[5] = -1;
+//    YR[6] = 0;
+//    YR[7] = 0.75;
+//    YR[8] = 0;
+
+    //Test de Dai et Woodward
+    YL[0] = 1.08;
+    YL[1] = 1.2;
+    YL[3] = 0.01;
+    YL[4] = 0.5;
+    YL[2] = 0.95;
+    YL[5] = 1.0155412503859613165;
+    YL[6] = 0.56418958354775628695;
+    YL[7] = 1.1283791670955125739;
+    YL[8] = 0;
+
+    YR[0] = 1;
+    YR[1] = 0;
+    YR[3] = 0;
+    YR[4] = 0;
+    YR[2] = 1;
+    YR[5] = 1.1283791670955125739;
+    YR[6] = 0.56418958354775628695;
+    YR[7] = 1.1283791670955125739;
+    YR[8] = 0;
+
+
+    conservatives(YL, WL);
+    conservatives(YR, WR);
+
+
+    if(*x < 0)
+        for(int i=0; i<_M; i++){
+            W[i] = WL[i];
+        }
+    else
+        for(int i=0; i<_M; i++){
+            W[i] = WR[i];
+        }
+#endif
+#ifdef _2D
+// Orzag-Tang
+    real Y[_M];
+
+    real gam = _GAM;
+
+    Y[0] = gam*gam;
+    Y[1] = -sin(*y);
+    Y[2] = gam;
+    Y[3] = sin(*x);
+    Y[4] = 0.0;
+    Y[5] = sin(2*(*x));
+    Y[6] = 0.0;
+    Y[7] = -sin(*y);
+    Y[8] = 0.0;
+
+    conservatives(Y, W);
+    //printf("%f ",W[0]);
+#endif
+
+}
+
 // c'est les vraies fonctions pour les vecteurs je pense très fort
 void copy(real* A, real* B){
   int i;
@@ -73,34 +177,35 @@ void copy(real* A, real* B){
 
 void conservatives(real* Y, real* W){
 
-  real gam = _GAM;
-
-  copy(W,Y);
   int i;
-  for(i = 1; i <= 4; i ++){
+  W[0] = Y[0];
+  for(i = 1; i < 5; i++){
     if(i == 2){
-      W[i] = Y[2]/(gam-1) + Y[0]*(Y[1]*Y[1]+Y[3]*Y[3]+Y[4]*Y[4])/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6])/2;
+      W[2] = (_GAM-1)*(Y[2] + Y[0]*(Y[1]*Y[1] + Y[4]*Y[4] + Y[3]*Y[3])/2 + (Y[5]*Y[5] + Y[6]*Y[6] + Y[7]*Y[7])/2);
     }
     else{
-      W[i] = W[0] * W[i];
+      W[i] = Y[i]*Y[0];
     }
-
+  }
+  for(i = 5; i < _M; i++){
+    W[i] = Y[i];
   }
 }
 
 void primitives(real* Y, real* W){
 
-  real gam = _GAM;
-
-  copy(Y,W);
   int i;
-  for(i = 1; i <= 4; i ++){
+  Y[0] = W[0];
+  for(i = 1; i < 5; i++){
     if(i == 2){
-      Y[i] = (gam-1)*(W[i] - W[0]*(W[1]*W[1]+W[3]*W[3]/(Y[0]*Y[0])+W[4]*W[4]/(Y[0]*Y[0]))/2 + (Y[7]*Y[7]+Y[5]*Y[5]+Y[6]*Y[6]));
+      Y[2] = W[2]/(_GAM-1) + Y[0]*(Y[1]*Y[1] + Y[3]*Y[3] + Y[4]*Y[4])/2 + (W[5]*W[5] + W[6]*W[6] + W[7]*W[7])/2;
     }
     else{
-      Y[i] = Y[i] / Y[0];
+      Y[i] = W[i]/W[0];
     }
+  }
+  for(i = 5; i < _M; i++){
+    Y[i] = W[i];
   }
 }
 
@@ -138,14 +243,20 @@ void Rusanov(real* Wl, real* Wr, real* n, real* rus){
 
   real flux1[_M];
   real flux2[_M];
-
+/*
+  printf("\n\n\n\n");
+  for(int i = 0; i < _M; i ++){
+    printf("Wl[%d] = %f \n", i, Wl[i]);
+    printf("Wr[%d] = %f \n", i, Wr[i]);
+  }
+*/
   flux(Wl, n, flux1);
   flux(Wr, n, flux2);
 
   int i;
   //printf("rus1\n");
   for(i =0; i < _M; i ++){
-    rus[i] = ((flux1[i] + flux2[i])/2 - 3*(Wr[i] - Wl[i]));
+    rus[i] = (0.5*(flux1[i] + flux2[i]) - _CH*(Wr[i] - Wl[i]));
     //printf("irus : %d\n", i);
   }
   //printf("rus2\n");
@@ -167,11 +278,22 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   //tab suivant
   real Wns[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
 
+  real Wcopy[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
+  for(int  i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
+    Wcopy[i] = Wn1[i];
+  }
+
   //tab special
   real Wi[_M];
   real W1[_M];
   real W2[_M];
-  real *zero = (real*)calloc(_M, sizeof(real));
+  real zero[_M];
+  for(int i = 0; i < _M; i++){
+    zero[i] = (real)0;
+  }
+
+  real min = _XMIN;
+  real max = _XMAX;
 
   //norx est le vecteur normal nx : (1, 0, 0)
   real norx[3];
@@ -185,19 +307,18 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
 
   for(int i=0; i<_NXTRANSBLOCK; i++){
-    for(int j=0; j<_NYTRANSBLOCK; j++){
-      //printf("i2 : %f; j2 : %f; x : %f; y : %f || ",i2,j2,x,y);
-      //printf("i : %d; j : %d; i2 : %d; j2 : %d; x : %d; y : %d\n",i,j,i2,j2,x,y);
+    for(int j=0; j < _NYTRANSBLOCK; j++){
       for(int k=0;k<_M;k++){
-        //printf("%f |", wtmp[k]);
-        Wi[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
+        Wi[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
       }
-
+      int b;
+      scanf("%d",&b);
+      printf("rho : %f\n", Wn1[0]);
       //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-      if(i > 0 && i < _NXTRANSBLOCK - 1){
+      if(i > 0 && i < _NXTRANSBLOCK ){
         for(int k = 0; k < _M; k ++){
-          W1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
-          W2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+          W1[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+          W2[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
         }
         Rusanov(Wi, W2, norx, flux1);
         Rusanov(W1, Wi, norx, flux2);
@@ -207,21 +328,25 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
       // j ai mis oui pour l instant mais cest a verifier
       else if(i == 0){
         for(int k = 0; k < _M; k ++){
-          W2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+          W2[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
         }
+        Wexact(&min, zero, W1);
         Rusanov(Wi, W2, norx, flux1);
         Rusanov(zero, Wi, norx, flux2);
       }
 
       else{
         for(int k = 0; k < _M; k ++){
-          W1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+          W1[k] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
         }
+        Wexact(&max, zero, W2);
         Rusanov(Wi, zero, norx, flux1);
         Rusanov(W1, Wi, norx, flux2);
       }
       for(int k = 0; k < _M; k ++){
-        Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] = Wns[i + j] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] - (*dtt/dx)*((real)flux1[j] - flux2[j]);;
+        Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] = Wns[i + j] = Wcopy[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ] - (*dtt/dx)*((real)flux1[k] - flux2[k]);
+        printf("i : %d, j : %d, k : %d \n", i, j, k);
+        printf("valeur : %f, flux1 : %f, flux2 : %f, Wns : %f \n", Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ], flux1[k], flux2[k], Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i ]);
       }
     }
     //printf("\n");
@@ -232,7 +357,6 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   for(int i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
-  free(zero);
 
 }
 
@@ -273,78 +397,84 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux3[_M];
   real flux4[_M];
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
+  for(int i=0; i<_NXTRANSBLOCK; i++){
+    for(int j=0; j < _NYTRANSBLOCK; j++){
+      for(int k=0;k<_M;k++){
+        W[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i];
+      }
+      printf("rho : %f\n", Wn1[0]);
+      //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
+      if(i > 0 && i < _NXTRANSBLOCK ){
+        for(int k = 0; k < _M; k ++){
+          Wi1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+          Wi2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+        }
+        Rusanov(W, Wi2, norx, flux1);
+        Rusanov(Wi1, W, norx, flux2);
+      }
 
-    //on recupere les composant W
-    for(j = 0; j < _M; j ++){
-      W[j] = Wn1[i + j];
-    }
+      // est ce que ça vaut 0 en dehors de la grille ?
+      // j ai mis oui pour l instant mais cest a verifier
+      else if(i == 0){
+        for(int k = 0; k < _M; k ++){
+          Wi2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i + 1];
+        }
+        Rusanov(W, Wi2, norx, flux1);
+        Rusanov(zero, W, norx, flux2);
+      }
 
-    //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-    if(i != 0 && i != _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
-      //printf("%d\n",i);
-      for(j = 0; j < _M; j ++){
-        Wi1[j] = Wn1[(i - 1) + j];
+      else{
+        for(int k = 0; k < _M; k ++){
+          Wi1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i - 1];
+        }
+        Rusanov(W, zero, norx, flux1);
+        Rusanov(Wi1, W, norx, flux2);
       }
-      for(j = 0; j < _M; j ++){
-        Wi2[j] = Wn1[(i + 1) + j];
-      }
-      Rusanov(W, Wi2, norx, flux1);
-      Rusanov(Wi1, W, norx, flux2);
-    }
 
-    // est ce que ça vaut 0 en dehors de la grille ?
-    // j ai mis oui pour l instant mais cest a verifier
-    else if(i == 0){
-      for(j = 0; j < _M; j ++){
-        Wi2[j] = Wn1[(i + 1) + j];
+      if(j > 0 && j < _NYTRANSBLOCK ){
+        for(int k = 0; k < _M; k ++){
+          Wj1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ (j - 1)*_NXTRANSBLOCK + i];
+          Wj2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ (j + 1)*_NXTRANSBLOCK + i];
+        }
+        Rusanov(W, Wj2, norx, flux1);
+        Rusanov(Wj1, W, norx, flux2);
       }
-      Rusanov(W, Wi2, norx, flux1);
-      Rusanov(zero, W, norx, flux2);
-    }
 
-    else{
-      for(j = 0; j < _M; j ++){
-        Wi1[j] = Wn1[(i - 1) + j];
+      // est ce que ça vaut 0 en dehors de la grille ?
+      // j ai mis oui pour l instant mais cest a verifier
+      else if(i == 0){
+        for(int k = 0; k < _M; k ++){
+          Wj2[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ (j + 1)*_NXTRANSBLOCK + i];
+        }
+        Rusanov(W, Wj2, norx, flux1);
+        Rusanov(zero, W, norx, flux2);
       }
-      Rusanov(W, zero, norx, flux1);
-      Rusanov(Wi1, W, norx, flux2);
-    }
 
-    if(i < _NXTRANSBLOCK){
-      for(j = 0; j < _M; j ++){
-        Wj2[j] = Wn1[(i + _NXTRANSBLOCK) + j];
+      else{
+        for(int k = 0; k < _M; k ++){
+          Wj1[k] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ (j - 1)*_NXTRANSBLOCK + i];
+        }
+        Rusanov(W, zero, norx, flux1);
+        Rusanov(Wj1, W, norx, flux2);
       }
-      Rusanov(W, Wj2, norx, flux3);
-      Rusanov(zero, W, norx, flux4);
-    }
-    else if(i > _NXTRANSBLOCK * (_NYTRANSBLOCK - 1)){
-      for(j = 0; j < _M; j ++){
-        Wj1[j] = Wn1[(i - _NXTRANSBLOCK) + j];
-      }
-      Rusanov(W, zero, norx, flux3);
-      Rusanov(Wj1, W, norx, flux4);
-    }
-    else{
-      for(j = 0; j < _M; j ++){
-        Wj1[j] = Wn1[(i - _NXTRANSBLOCK) + j];
-      }
-      for(j = 0; j < _M; j ++){
-        Wj2[j] = Wn1[(i + _NXTRANSBLOCK) + j];
-      }
-      Rusanov(W, Wj2, norx, flux3);
-      Rusanov(Wj1, W, norx, flux4);
-    }
 
-    for(j = 0; j < _M; j ++){
-      Wns[i + j] = (real)Wn1[i + j] - (real)(*dtt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(*dtt/dy)*((real)flux3[j] - (real)flux4[j]);
+      for(int k = 0; k < _M; k ++){
+        Wns[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i] = Wn1[k*_NXTRANSBLOCK*_NYTRANSBLOCK+ j*_NXTRANSBLOCK + i] - (*dtt/dx)*(flux1[k] - flux2[k]) - (*dtt/dy)*(flux3[k] - flux4[k]);
+      }
     }
+    //printf("\n");
+    //printf("\n");
 
+    //printf("NX : %i; NY : %i\n", _NXTRANSBLOCK, _NYTRANSBLOCK);
   }
+  for(int i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
+    Wn1[i] = Wns[i];
+  }
+
+
 
   for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
-  free(zero);
 
 }

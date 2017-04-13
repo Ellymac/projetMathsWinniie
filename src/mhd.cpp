@@ -85,109 +85,6 @@ void Ref2PhysMap(real *x, real *y, real *z, real *t){
 
 
 
-void Wexact(real* x, real* y, real* W){
-
-#ifdef _1D
-    real YL[_M], YR[_M], WR[_M], WL[_M];
-
-//    // Test de Choc fort
-//    YL[0] = 3;
-//    YL[1] = 1.3;
-//    YL[3] = 0;
-//    YL[4] = 0;
-//    YL[2] = 3;
-//    YL[5] = 1;
-//    YL[6] = 1;
-//    YL[7] = 1.5;
-//    YL[8] = 0;
-//
-//    YR[0] = 1;
-//    YR[1] = 1.3;
-//    YR[3] = 0;
-//    YR[4] = 0;
-//    YR[2] = 1;
-//    YR[5] = 0.0707372016677029;
-//    YR[6] = 0.9974949866040544;
-//    YR[7] = 1.5;
-//    YR[8] = 0;
-
-//    // Test de Brio et Wu
-//    YL[0] = 1;
-//    YL[1] = 0;
-//    YL[3] = 0;
-//    YL[4] = 0;
-//    YL[2] = 1;
-//    YL[5] = 1;
-//    YL[6] = 0;
-//    YL[7] = 0.75;
-//    YL[8] = 0;
-//
-//    YR[0] = 0.125;
-//    YR[1] = 0;
-//    YR[3] = 0;
-//    YR[4] = 0;
-//    YR[2] = 0.1;
-//    YR[5] = -1;
-//    YR[6] = 0;
-//    YR[7] = 0.75;
-//    YR[8] = 0;
-
-    //Test de Dai et Woodward
-    YL[0] = 1.08;
-    YL[1] = 1.2;
-    YL[3] = 0.01;
-    YL[4] = 0.5;
-    YL[2] = 0.95;
-    YL[5] = 1.0155412503859613165;
-    YL[6] = 0.56418958354775628695;
-    YL[7] = 1.1283791670955125739;
-    YL[8] = 0;
-
-    YR[0] = 1;
-    YR[1] = 0;
-    YR[3] = 0;
-    YR[4] = 0;
-    YR[2] = 1;
-    YR[5] = 1.1283791670955125739;
-    YR[6] = 0.56418958354775628695;
-    YR[7] = 1.1283791670955125739;
-    YR[8] = 0;
-
-
-    conservatives(YL, WL);
-    conservatives(YR, WR);
-
-
-    if(*x < 0)
-        for(int i=0; i<_M; i++){
-            W[i] = WL[i];
-        }
-    else
-        for(int i=0; i<_M; i++){
-            W[i] = WR[i];
-        }
-#endif
-#ifdef _2D
-// Orzag-Tang
-    real Y[_M];
-
-    real gam = _GAM;
-
-    Y[0] = gam*gam;
-    Y[1] = -sin(*y);
-    Y[2] = gam;
-    Y[3] = sin(*x);
-    Y[4] = 0.0;
-    Y[5] = sin(2*(*x));
-    Y[6] = 0.0;
-    Y[7] = -sin(*y);
-    Y[8] = 0.0;
-
-    conservatives(Y, W);
-    //printf("%f ",W[0]);
-#endif
-
-}
 // }}}
 
 
@@ -196,8 +93,8 @@ void InitData(real* w){
 
   real wtmp[_M];
   real x, y;
-  for(int i=0; i<_NXTRANSBLOCK; i++){
-    for(int j=0; j<_NYTRANSBLOCK; j++){
+  for(int j=0; j<_NYTRANSBLOCK; j++){
+    for(int i=0; i<_NXTRANSBLOCK; i++){
       real i2 = ((real)i)/(real)_NXTRANSBLOCK; // i2 c'est pas beau
       real j2 = ((real)j)/(real)_NYTRANSBLOCK;
       Ref2PhysMap(&i2,&j2,&x,&y);
