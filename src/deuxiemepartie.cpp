@@ -172,7 +172,6 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
       }
       Rusanov(W, W2, norx, flux1);
       Rusanov(W1, W, norx, flux2);
-      untrucutile(W, W3, W4, norx, flux3, flux4);
     }
 
     // est ce que ça vaut 0 en dehors de la grille ?
@@ -183,7 +182,6 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
       }
       Rusanov(Wi, W2, norx, flux1);
       Rusanov(0, Wi, norx, flux2);
-      untrucutile(W, W3, W4, norx, flux3, flux4);
     }
 
     else{
@@ -192,9 +190,20 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
       }
       Rusanov(Wi, 0, norx, flux1);
       Rusanov(W1, Wi, norx, flux2);
-      untrucutile(W, W3, W4, norx, flux3, flux4);
     }
 
+    if(i < _NXTRANSBLOCK){
+      Rusanov(W, W4, norx, flux3);
+      Rusanov(0, W, norx, flux4);
+    }
+    else if(i > _NXTRANSBLOCK * (_NYTRANSBLOCK - 1)){
+      Rusanov(W, 0, norx, flux3);
+      Rusanov(W3, W, norx, flux4);
+    }
+    else{
+      Rusanov(W, W4, norx, flux3);
+      Rusanov(W3, W, norx, flux4);
+    }
 
     for(j = 0; j < _M; j ++){
       Wns[i * _M + j] = (real)Wn1[i * _M + j] - (real)(dt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(dt/dy)((real)flux3[j] - (real)flux4[j]);
