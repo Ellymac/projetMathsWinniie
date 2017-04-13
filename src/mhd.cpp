@@ -547,7 +547,7 @@ int main(int argc, char const* argv[]){
     InitData(Wn1);
 
     int iter = 0;
-    real dtt = 0;
+    real dtt = (_XMAX - _XMIN) / (_NXTRANSBLOCK * 6) - _CFL;
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;;
