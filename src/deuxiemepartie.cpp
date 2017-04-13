@@ -27,9 +27,6 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real Nx = 1;
   real dx = (_XMAX - _XMIN)/Nx;
 
-  real alpha = dx/6;
-  real dt = alpha - _CFL;
-
   int i, j;
 
   //tab suivant
@@ -51,7 +48,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux2[_M];
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK; i + _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -59,7 +56,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
     }
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1 ){
+    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
       for(j = 0; j < _M; j ++){
         W1[j] = Wn1[_M * (i - 1) + j];
       }
@@ -97,6 +94,9 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
   // est ce que la fonction se rappel elle meme et affiche la grille
   // ou on l'appelle dans une boucle ?
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; I ++){
+    Wn1[i] = Wns[i];
+  }
 
 }
 
@@ -112,9 +112,6 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
   real Ny = _NYTRANSBLOCK;
   real dy = (_YMAX - _YMIN)/Ny
-
-  real alpha = dx/6;
-  real dt = alpha - _CFL;
 
   int i, j;
 
@@ -141,7 +138,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux4[_M];
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK; i + _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -149,7 +146,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
     }
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1 ){
+    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
       for(j = 0; j < _M; j ++){
         W1[j] = Wn1[_M * (i - 1) + j];
       }
@@ -192,9 +189,13 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
     }
 
     for(j = 0; j < _M; j ++){
-      Wns[i * _M + j] = (real)Wn1[i * _M + j] - (real)(dt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(dt/dy)((real)flux3[j] - (real)flux4[j]);
+      Wns[i * _M + j] = (real)Wn1[i * _M + j] - (real)(dtt/dx)*((real)flux1[j] - (real)flux2[j]) - (real)(dtt/dy)((real)flux3[j] - (real)flux4[j]);
     }
 
+  }
+
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; I ++){
+    Wn1[i] = Wns[i];
   }
 
 }
