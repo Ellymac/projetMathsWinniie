@@ -16,22 +16,6 @@ void Rusanov(real* Wl, real* Wr, real* n, real* rus){
 
 }
 
-
-void untrucutile(real* W, real* W3, real* W4, real norx[3], real* flux3, real* flux4){
-  if(i < _NXTRANSBLOCK){
-    Rusanov(W, W4, norx, flux3);
-    Rusanov(0, W, norx, flux4);
-  }
-  else if(i > _NXTRANSBLOCK * (_NYTRANSBLOCK - 1)){
-    Rusanov(W, 0, norx, flux3);
-    Rusanov(W3, W, norx, flux4);
-  }
-  else{
-    Rusanov(W, W4, norx, flux3);
-    Rusanov(W3, W, norx, flux4);
-  }
-}
-
 void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   //la fonction prend un dtt en argument mais ej sais aps a quoi il correspond
   // c'est peut être le dt que je définis après mais c'est a vérifier
