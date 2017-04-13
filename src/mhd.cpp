@@ -16,7 +16,6 @@
 #include <cstdlib>
 
 #include "resolve.h"
-#include "mhd.h"
 
 using namespace std;
 // }}}
