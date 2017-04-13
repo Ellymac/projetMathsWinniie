@@ -1,8 +1,8 @@
 // vim: set sw=4 ts=4 sts=4 et tw=78 foldmarker={{{,}}} foldlevel=0 foldmethod=marker spell:
 
 // cas {{{
-//#define _1D
-#define _2D
+#define _1D
+//#define _2D
 // }}}
 
 // include {{{
@@ -505,7 +505,8 @@ int main(int argc, char const* argv[]){
     InitData(Wn1);
 
     int iter = 0;
-    real dtt = (_XMAX - _XMIN) / (_NXTRANSBLOCK * 6) - _CFL;
+    //real dtt = (_XMAX - _XMIN) / (_NXTRANSBLOCK * 6) - _CFL;
+    real dtt = 0.01;
     for(real t=0;t<_TMAX; t=t+dtt){
 
         cout << "Iter="<<iter++<< endl;

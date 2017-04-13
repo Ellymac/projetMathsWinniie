@@ -1,6 +1,6 @@
 // cas {{{
-//#define _1D
-#define _2D
+#define _1D
+//#define _2D
 // }}}
 
 
@@ -143,12 +143,12 @@ void Rusanov(real* Wl, real* Wr, real* n, real* rus){
   flux(Wr, n, flux2);
 
   int i;
-  printf("rus1\n");
+  //printf("rus1\n");
   for(i =0; i < _M; i ++){
     rus[i] = ((flux1[i] + flux2[i])/2 - 3*(Wr[i] - Wl[i]));
-    printf("irus : %d\n", i);
+    //printf("irus : %d\n", i);
   }
-  printf("rus2\n");
+  //printf("rus2\n");
 
 }
 
@@ -166,12 +166,12 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   int i, j;
 
   //tab suivant
-  real *Wns = (real*)malloc(_NXTRANSBLOCK*_NYTRANSBLOCK*_M);
+  real Wns[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
 
   //tab special
-  real *Wi = (real*)malloc(_M);
-  real *W1 = (real*)malloc(_M);
-  real *W2 = (real*)malloc(_M);
+  real Wi[_M];
+  real W1[_M];
+  real W2[_M];
   real *zero = (real*)calloc(_M, sizeof(real));
 
   //norx est le vecteur normal nx : (1, 0, 0)
@@ -183,14 +183,17 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   // utile pour le calcul
   real flux1[_M];
   real flux2[_M];
+  real coucou;
 
 
   for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
-
+    //printf(" début %d\n",i);
     //on recupere les composant W
+
     for(j = 0; j < _M; j ++){
-      Wi[j] = Wn1[i + j];
+      Wi[j] = Wn1[i+j];
     }
+
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
     if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
@@ -222,18 +225,27 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
       Rusanov(W1, Wi, norx, flux2);
     }
 
+    //printf(" milieu %d %f\n",i);
 
     for(j = 0; j < _M; j ++){
-      Wns[i + j] = (real)Wn1[i + j] - (real)(*dtt/dx)*((real)flux1[j] - (real)flux2[j]);
+      //printf("Wns[%d+%d] : %f \n", i,j, Wns[i+j]); // Wns[i+j] ne provoque pas de segfault
+      coucou = Wn1[i+j] - (*dtt/dx)*(flux1[j] - flux2[j]);
+      //printf("coucou : %f\n", coucou); // coucou ne provoque pas de segfault
+      Wns[i+j] = coucou; // provoque un segfault
+      //printf("  j  : %d; i+j : %d, max : %d \n",j,i+j, _NXTRANSBLOCK*_NYTRANSBLOCK*_M);
     }
+
+
 
   }
 
   // est ce que la fonction se rappel elle meme et affiche la grille
   // ou on l'appelle dans une boucle ?
+
   for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
+  free(zero);
 
 }
 
@@ -252,14 +264,14 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
   int i, j;
   //tab suivant
-  real *Wns = (real*)malloc(_NXTRANSBLOCK*_NYTRANSBLOCK*_M);
+  real Wns[_NXTRANSBLOCK*_NYTRANSBLOCK*_M];
 
   //tab special
-  real *W = (real*)malloc(_M);
-  real *Wi1 = (real*)malloc(_M);
-  real *Wi2 = (real*)malloc(_M);
-  real *Wj1 = (real*)malloc(_M);
-  real *Wj2 = (real*)malloc(_M);
+  real W[_M];
+  real Wi1[_M];
+  real Wi2[_M];
+  real Wj1[_M];
+  real Wj2[_M];
   real *zero = (real*)calloc(_M, sizeof(real));
 
   //norx est le vecteur normal nx : (1, 0, 0)
@@ -283,7 +295,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
     if(i != 0 && i != _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
-      printf("%d\n",i);
+      //printf("%d\n",i);
       for(j = 0; j < _M; j ++){
         Wi1[j] = Wn1[(i - 1) + j];
       }
@@ -346,5 +358,6 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i ++){
     Wn1[i] = Wns[i];
   }
+  free(zero);
 
 }
