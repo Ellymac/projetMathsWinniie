@@ -158,7 +158,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   //Nx nombre de mailles du maillage dans la direction x
   // ça vaut peut etre _NXTRANSBLOCK : a verifier
   // je le met a 1 pour que ça compile
-  real Nx = 1;
+  real Nx = _NXTRANSBLOCK;
   real dx = (_XMAX - _XMIN)/Nx;
 
   int i, j;
@@ -170,6 +170,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real *Wi = (real*)malloc(_M);
   real *W1 = (real*)malloc(_M);
   real *W2 = (real*)malloc(_M);
+  real *zero = (real*)calloc(_M, sizeof(real));
 
   //norx est le vecteur normal nx : (1, 0, 0)
   real norx[3];
@@ -182,7 +183,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux2[_M];
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -208,14 +209,14 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
         W2[j] = Wn1[(i + 1) + j];
       }
       Rusanov(Wi, W2, norx, flux1);
-      Rusanov(0, Wi, norx, flux2);
+      Rusanov(zero, Wi, norx, flux2);
     }
 
     else{
       for(j = 0; j < _M; j ++){
         W1[j] = Wn1[(i - 1) + j];
       }
-      Rusanov(Wi, 0, norx, flux1);
+      Rusanov(Wi, zero, norx, flux1);
       Rusanov(W1, Wi, norx, flux2);
     }
 
@@ -258,6 +259,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real *Wi2 = (real*)malloc(_M);
   real *Wj1 = (real*)malloc(_M);
   real *Wj2 = (real*)malloc(_M);
+  real *zero = (real*)calloc(_M, sizeof(real));
 
   //norx est le vecteur normal nx : (1, 0, 0)
   real norx[3];
@@ -272,7 +274,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux4[_M];
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -298,14 +300,14 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
         Wi2[j] = Wn1[(i + 1) + j];
       }
       Rusanov(W, Wi2, norx, flux1);
-      Rusanov(0, W, norx, flux2);
+      Rusanov(zero, W, norx, flux2);
     }
 
     else{
       for(j = 0; j < _M; j ++){
         Wi1[j] = Wn1[(i - 1) + j];
       }
-      Rusanov(W, 0, norx, flux1);
+      Rusanov(W, zero, norx, flux1);
       Rusanov(Wi1, W, norx, flux2);
     }
 
@@ -314,13 +316,13 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
         Wj2[j] = Wn1[(i + _NXTRANSBLOCK) + j];
       }
       Rusanov(W, Wj2, norx, flux3);
-      Rusanov(0, W, norx, flux4);
+      Rusanov(zero, W, norx, flux4);
     }
     else if(i > _NXTRANSBLOCK * (_NYTRANSBLOCK - 1)){
       for(j = 0; j < _M; j ++){
         Wj1[j] = Wn1[(i - _NXTRANSBLOCK) + j];
       }
-      Rusanov(W, 0, norx, flux3);
+      Rusanov(W, zero, norx, flux3);
       Rusanov(Wj1, W, norx, flux4);
     }
     else{
