@@ -143,10 +143,12 @@ void Rusanov(real* Wl, real* Wr, real* n, real* rus){
   flux(Wr, n, flux2);
 
   int i;
-
+  printf("rus1\n");
   for(i =0; i < _M; i ++){
     rus[i] = ((flux1[i] + flux2[i])/2 - 3*(Wr[i] - Wl[i]));
+    printf("irus : %d\n", i);
   }
+  printf("rus2\n");
 
 }
 
@@ -183,7 +185,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux2[_M];
 
 
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -222,7 +224,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
 
 
     for(j = 0; j < _M; j ++){
-      Wns[i + j] = (real)Wn1[i * _M + j] - (real)(*dtt/dx)*((real)flux1[j] - (real)flux2[j]);
+      Wns[i + j] = (real)Wn1[i + j] - (real)(*dtt/dx)*((real)flux1[j] - (real)flux2[j]);
     }
 
   }
@@ -249,7 +251,6 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real dy = (_YMAX - _YMIN)/Ny;
 
   int i, j;
-
   //tab suivant
   real *Wns = (real*)malloc(_NXTRANSBLOCK*_NYTRANSBLOCK*_M);
 
@@ -273,8 +274,7 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   real flux3[_M];
   real flux4[_M];
 
-
-  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i + _M){
+  for(i = 0; i < _NXTRANSBLOCK*_NYTRANSBLOCK*_M; i += _M){
 
     //on recupere les composant W
     for(j = 0; j < _M; j ++){
@@ -282,7 +282,8 @@ void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
     }
 
     //attention si i = 0 ou i = _NXTRANSBLOCK*_NYTRANSBLOCK*_M - 1
-    if(i > 0 && i < _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
+    if(i != 0 && i != _NXTRANSBLOCK*_NYTRANSBLOCK*(_M - 1)){
+      printf("%d\n",i);
       for(j = 0; j < _M; j ++){
         Wi1[j] = Wn1[(i - 1) + j];
       }
