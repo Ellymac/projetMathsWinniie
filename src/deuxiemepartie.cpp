@@ -32,8 +32,10 @@ void untrucutile(real* W, real* W3, real* W4, real norx[3], real* flux3, real* f
   }
 }
 
-void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
-  //
+void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
+  //la fonction prend un dtt en argument mais ej sais aps a quoi il correspond
+  // c'est peut être le dt que je définis après mais c'est a vérifier
+  // en plus c'est un pointer
 
   //Nx nombre de mailles du maillage dans la direction x
   // ça vaut peut etre _NXTRANSBLOCK : a verifier
@@ -115,7 +117,7 @@ void TimesStepCPU1D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
 }
 
 
-void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M]){
+void TimesStepCPU2D(real Wn1[_NXTRANSBLOCK*_NYTRANSBLOCK*_M], real* dtt){
   //
 
   //Nx nombre de mailles du maillage dans la direction x
